@@ -59,6 +59,7 @@ object Keys {
   val apkFile = SettingKey[File]("apk-file",
     "consistent file name for apk output, used for ide integration")
   val signRelease = TaskKey[File]("sign-release", "sign the release build")
+  val signAar     = TaskKey[File]("sign-aar", "sign the AAR artifact")
   val zipalignPath = SettingKey[String]("zipalign-path",
     "path to the zipalign executable")
   val zipalign = TaskKey[File]("zipalign", "zipalign the final package")

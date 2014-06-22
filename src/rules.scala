@@ -303,6 +303,7 @@ object Plugin extends sbt.Plugin {
     apkbuildExcludes         := Seq.empty,
     apkbuild                <<= apkbuildTaskDef,
     signRelease             <<= signReleaseTaskDef,
+    signAar                 <<= signAarTaskDef,
     zipalign                <<= zipalignTaskDef,
     packageT                <<= zipalign,
     instrumentTestTimeout    := 180000,

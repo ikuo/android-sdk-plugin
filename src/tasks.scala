@@ -689,7 +689,7 @@ object Tasks {
         case (Some(alias),Some(store),Some(passwd)) =>
         import SignJar._
         val t = Option(p.getProperty("key.store.type")) getOrElse "jks"
-        val signed = bin / a.getName.replace("-unsigned", "-unaligned")
+        val signed = bin / a.getName.replace("-unsigned", "")
         val options = Seq( storeType(t)
                          , storePassword(passwd)
                          , signedJar(signed)
@@ -704,6 +704,40 @@ object Tasks {
         signed
         case _ =>
         s.log.warn("Package needs signing: " + a.getName)
+        a
+      }
+    }
+  }
+
+  val signAarTaskDef = (properties, packageAar, streams) map {
+    (p, a, s) =>
+    val bin = a.getParentFile
+    if (createDebug) {
+      s.log.info("Debug package does not need signing: " + a.getName)
+      a
+    } else {
+      (Option(p.getProperty("key.alias")),
+        Option(p.getProperty("key.store")),
+        Option(p.getProperty("key.store.password"))) match {
+
+        case (Some(alias),Some(store),Some(passwd)) =>
+        import SignJar._
+        val t = Option(p.getProperty("key.store.type")) getOrElse "jks"
+        val signed = bin / a.getName.replace("-unsigned", "-unaligned")
+        val options = Seq( storeType(t)
+                         , storePassword(passwd)
+                         , signedJar(signed)
+                         , keyStore(file(store).toURI.toURL)
+                         )
+        sign(a, alias, options) { (jarsigner, args) =>
+          (jarsigner +: (args ++ Seq(
+            "-digestalg", "SHA1", "-sigalg", "MD5withRSA"))) !
+        }
+
+        s.log.info("Signed: " + signed.getName)
+        signed
+        case _ =>
+        s.log.warn("Package needs signing: " + a.name)
         a
       }
     }
